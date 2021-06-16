@@ -6,6 +6,9 @@ var detectEvents = require("./src/events/detect")
 var constructorFromGlobal = require("./src/getConstructor/fromGlobal")
 var constructorFromRequireContextWithGlobalFallback = require("./src/getConstructor/fromRequireContextWithGlobalFallback")
 
+var renderWithReactDOM = require("./src/renderComponent/withReactDOM")
+var renderWithHotReload = require("./src/renderComponent/withHotReload")
+
 var ReactRailsUJS = {
   // This attribute holds the name of component which should be mounted
   // example: `data-react-class="MyApp.Items.EditForm"`
@@ -71,6 +74,11 @@ var ReactRailsUJS = {
   useContext: function(requireContext) {
     this.getConstructor = constructorFromRequireContextWithGlobalFallback(requireContext)
   },
+  
+  // Called after React unmounts component at `node`
+  // Override this function to perform any cleanup
+  // the default function does nothing
+  onComponentUnmountAtNode: function (node) {},
 
   // Render `componentName` with `props` to a string,
   // using the specified `renderFunction` from `react-dom/server`.
@@ -78,6 +86,18 @@ var ReactRailsUJS = {
     var componentClass = this.getConstructor(componentName)
     var element = React.createElement(componentClass, props)
     return ReactDOMServer[renderFunction](element)
+  },
+
+  // Render `component` using the specified `renderFunction` from `react-dom`.
+  // Override this function to render components in a custom way.
+  // function signature: ("hydrate" | "render", component, node, props)
+  renderComponent: renderWithReactDOM,
+
+  // Enables hot reload for component rendering.
+  //
+  // See the HMR section in README to ensure required steps are completed.
+  useHotReload: function(requireContext) {
+    this.renderComponent = renderWithHotReload(requireContext)
   },
 
   // Within `searchSelector`, find nodes which should have React components
@@ -112,9 +132,9 @@ var ReactRailsUJS = {
         }
 
         if (hydrate && typeof ReactDOM.hydrate === "function") {
-          component = ReactDOM.hydrate(component, node);
+          renderComponent("hydrate", component, node, props);
         } else {
-          component = ReactDOM.render(component, node);
+          renderComponent("render", component, node, props);
         }
       }
     } 
@@ -128,6 +148,7 @@ var ReactRailsUJS = {
     for (var i = 0; i < nodes.length; ++i) {
       var node = nodes[i];
       ReactDOM.unmountComponentAtNode(node);
+      ReactRailsUJS.onComponentUnmountAtNode(node);
     }
   },
 

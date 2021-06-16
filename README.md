@@ -695,7 +695,38 @@ LibV8 itself is already [beyond version 7](https://github.com/cowboyd/libv8/rele
 ### HMR
 Hot Module Replacement is [possible with this gem](https://stackoverflow.com/a/54846330/193785) as it does just pass through to Webpacker. Please open an issue to let us know tips and tricks for it to add to the wiki.
 
-Sample repo that shows HMR working with `react-rails`: [https://github.com/edelgado/react-rails-hmr](https://github.com/edelgado/react-rails-hmr)
+Similar to `useContext`, you can pass the webpack context into `useHotReload` to enable hot reload:
+1. install [react-hot-loader](https://github.com/gaearon/react-hot-loader) and [@hot-loader/react-dom](https://github.com/hot-loader/react-dom)
+2. add the following to your webpack config in dev:
+```js
+{
+  module: {
+    rules: [
+      {
+        test: /\.(jsx|tsx)?$/,
+        use: ["react-hot-loader/webpack"],
+      },
+    ],
+  },
+  resolve: {
+    alias: {
+      "react-dom": "@hot-loader/react-dom",
+    },
+  },
+}
+```
+3. in your entry file, usually where you call `ReactRailsUJS.useContext` already, call `useHotReload`:
+```js
+var ReactRailsUJS = require("react_ujs")
+var myCustomContext = require.context("custom_components", true)
+ReactRailsUJS.useHotReload(myCustomContext)
+```
+4. optionally, for CSS to hot reload, update the following for dev in `webpacker.yml`:
+```yml
+development:
+  <<: *default
+  extract_css: false
+```
 
 One caveat is that currently you [cannot Server-Side Render along with HMR](https://github.com/reactjs/react-rails/issues/925#issuecomment-415469572). 
 
