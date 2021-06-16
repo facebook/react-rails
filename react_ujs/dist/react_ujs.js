@@ -7,7 +7,7 @@
 		exports["ReactRailsUJS"] = factory(require("react"), require("react-dom"), require("react-dom/server"));
 	else
 		root["ReactRailsUJS"] = factory(root["React"], root["ReactDOM"], root["ReactDOMServer"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_3__, __WEBPACK_EXTERNAL_MODULE_4__, __WEBPACK_EXTERNAL_MODULE_5__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_4__, __WEBPACK_EXTERNAL_MODULE_5__, __WEBPACK_EXTERNAL_MODULE_6__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -73,7 +73,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 6);
+/******/ 	return __webpack_require__(__webpack_require__.s = 7);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -106,13 +106,43 @@ module.exports = function(className) {
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports) {
+
+// Load React components by requiring them from "components/", for example:
+//
+// - "pages/index" -> `require("components/pages/index")`
+// - "pages/show.Header" -> `require("components/pages/show").Header`
+// - "pages/show.Body.Content" -> `require("components/pages/show").Body.Content`
+//
+module.exports = function(reqctx) {
+  return function(className) {
+    var parts = className.split(".")
+    var filename = parts.shift()
+    var keys = parts
+    // Load the module:
+    var component = reqctx("./" + filename)
+    // Then access each key:
+    keys.forEach(function(k) {
+      component = component[k]
+    })
+    // support `export default`
+    if (component.__esModule) {
+      component = component["default"]
+    }
+    return component
+  }
+}
+
+
+/***/ }),
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var nativeEvents = __webpack_require__(7)
-var pjaxEvents = __webpack_require__(8)
-var turbolinksEvents = __webpack_require__(9)
-var turbolinksClassicDeprecatedEvents = __webpack_require__(11)
-var turbolinksClassicEvents = __webpack_require__(10)
+var nativeEvents = __webpack_require__(8)
+var pjaxEvents = __webpack_require__(9)
+var turbolinksEvents = __webpack_require__(10)
+var turbolinksClassicDeprecatedEvents = __webpack_require__(12)
+var turbolinksClassicEvents = __webpack_require__(11)
 
 // see what things are globally available
 // and setup event handlers to those things
@@ -164,14 +194,14 @@ module.exports = function(ujs) {
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Make a function which:
 // - First tries to require the name
 // - Then falls back to global lookup
 var fromGlobal = __webpack_require__(0)
-var fromRequireContext = __webpack_require__(12)
+var fromRequireContext = __webpack_require__(1)
 
 module.exports = function(reqctx) {
   var fromCtx = fromRequireContext(reqctx)
@@ -195,12 +225,6 @@ module.exports = function(reqctx) {
 
 
 /***/ }),
-/* 3 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE_3__;
-
-/***/ }),
 /* 4 */
 /***/ (function(module, exports) {
 
@@ -214,15 +238,22 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_5__;
 
 /***/ }),
 /* 6 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE_6__;
+
+/***/ }),
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var React = __webpack_require__(3)
-var ReactDOM = __webpack_require__(4)
-var ReactDOMServer = __webpack_require__(5)
+var React = __webpack_require__(4)
+var ReactDOM = __webpack_require__(5)
+var ReactDOMServer = __webpack_require__(6)
 
-var detectEvents = __webpack_require__(1)
+var detectEvents = __webpack_require__(2)
 var constructorFromGlobal = __webpack_require__(0)
-var constructorFromRequireContextWithGlobalFallback = __webpack_require__(2)
+var constructorFromRequireContext = __webpack_require__(1)
+var constructorFromRequireContextWithGlobalFallback = __webpack_require__(3)
 
 var ReactRailsUJS = {
   // This attribute holds the name of component which should be mounted
@@ -282,6 +313,11 @@ var ReactRailsUJS = {
   // Override this function to lookup classes in a custom way,
   // the default is ReactRailsUJS.ComponentGlobal
   getConstructor: constructorFromGlobal,
+
+  // Available for customizing `getConstructor`
+  constructorFromGlobal: constructorFromGlobal,
+  constructorFromRequireContext: constructorFromRequireContext,
+  constructorFromRequireContextWithGlobalFallback: constructorFromRequireContextWithGlobalFallback,
 
   // Given a Webpack `require.context`,
   // try finding components with `require`,
@@ -356,6 +392,7 @@ var ReactRailsUJS = {
   detectEvents: function() {
     detectEvents(this)
   },
+
 }
 
 // These stable references are so that handlers can be added and removed:
@@ -390,7 +427,7 @@ module.exports = ReactRailsUJS
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -413,7 +450,7 @@ module.exports = {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -433,7 +470,7 @@ module.exports = {
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -451,7 +488,7 @@ module.exports = {
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -469,7 +506,7 @@ module.exports = {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -485,36 +522,6 @@ module.exports = {
   teardown: function(ujs) {
     ujs.removeEvent('page:change', ujs.handleMount);
     ujs.removeEvent('page:receive', ujs.handleUnmount);
-  }
-}
-
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports) {
-
-// Load React components by requiring them from "components/", for example:
-//
-// - "pages/index" -> `require("components/pages/index")`
-// - "pages/show.Header" -> `require("components/pages/show").Header`
-// - "pages/show.Body.Content" -> `require("components/pages/show").Body.Content`
-//
-module.exports = function(reqctx) {
-  return function(className) {
-    var parts = className.split(".")
-    var filename = parts.shift()
-    var keys = parts
-    // Load the module:
-    var component = reqctx("./" + filename)
-    // Then access each key:
-    keys.forEach(function(k) {
-      component = component[k]
-    })
-    // support `export default`
-    if (component.__esModule) {
-      component = component["default"]
-    }
-    return component
   }
 }
 
