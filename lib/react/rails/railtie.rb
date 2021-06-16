@@ -1,8 +1,11 @@
 require 'rails'
+require_relative 'js_runtime_checker'
 
 module React
   module Rails
     class Railtie < ::Rails::Railtie
+      JsRuntimeChecker.call
+
       config.react = ActiveSupport::OrderedOptions.new
       # Sensible defaults. Can be overridden in application.rb
       config.react.variant = (::Rails.env.production? ? :production : :development)
